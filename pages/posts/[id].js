@@ -4,36 +4,25 @@ import Date from '../../components/date';
 import Head from 'next/head';
 import utilStyles from '../../styles/utils.module.css';
 
-export default function Post({ postData }) {
+export default function Home({ posts }) {
     return (
-      <Layout>
-        <Head>
-          <title>{postData.title}</title>
-        </Head>
-        <article>
-          <h1 className={utilStyles.headingXl}>{postData.title}</h1>
-          <div className={utilStyles.lightText}>
-            <Date dateString={postData.date} />
-          </div>
-          <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
-        </article>
-      </Layout>
+    <ul>
+      {posts.map(post => {
+        <li>
+          {post.title}
+        </li>
+      })}
+    </ul>
     );
   }
   
-export async function getStaticPaths() {
-    const paths = getAllPostIds();
-    return {
-        paths,
-        fallback: false
-    }
-  }
-
-  export async function getStaticProps({ params }) {
-    const postData = await getPostData(params.id)
+export async function getStaticProps(context) {
+    const res = await fetch('https://.../posts');
+    const data = await res.json();
     return {
         props: {
-            postData
-        }
+            posts: data.posts
+        },
+        revalidate: 60
     }
 }
